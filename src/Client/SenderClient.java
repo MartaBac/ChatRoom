@@ -72,19 +72,15 @@ public class SenderClient {
 				//agg
 				System.out.println("44");
 				
-				/*System.out.println(response);
-				if(response.equals("Unable to log.")==false){
-					System.out.println("if");
-					System.out.println(response.toString());
-				*/
-				nickname = lineNick;
-				/*System.out.println("1.6" + nickname);
+				if(response.getError().equals("0")){
+					// Errore di login
+					System.out.println("Impossibile effettuare il login con questo nickname");
+					nickname = null;
+					
+				}else{
+					System.out.println("Logged in as" + lineNick);
+					nickname = lineNick;
 				}
-				else{
-					response = inbuffer.readLine();
-					System.out.println("g");
-					System.out.println(response);
-				}*/
 			}
 			System.out.println("cycle 2");
 
