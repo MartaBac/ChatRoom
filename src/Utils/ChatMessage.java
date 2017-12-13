@@ -1,8 +1,9 @@
 package Utils;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class ChatMessage {
+public class ChatMessage implements Serializable {
 
 	private String message;
     private String sender;

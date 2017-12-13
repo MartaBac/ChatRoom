@@ -14,6 +14,7 @@ import java.net.Socket;
 
 import Server.ChatRoom;
 import Utils.ChatMessage;
+import Utils.ChatRensponse;
 import Utils.ChatRequest;
 public class SenderClient {
 
@@ -25,6 +26,7 @@ public class SenderClient {
 		InetSocketAddress addr  = new InetSocketAddress(ipaddr, port);
 		Socket s = new Socket();
 		String nickname = null;
+		boolean active = false;
 		ChatRequest cr;
 		
 		int size =-1;
@@ -55,40 +57,53 @@ public class SenderClient {
 				System.out.println("Inserire un nickname valido per accedere alla chat");
 				String lineNick = buffer.readLine();
 				// check se valido
+				System.out.println("letto");
 				cr = new ChatRequest("loginrequestsd",lineNick);
-				
 				oos.writeObject(cr);
 				oos.flush();
-				System.out.println("oos wrote object");
 				
 				is = s.getInputStream();
 				iis = new ObjectInputStream(is);
 				
 				//Server response
-				ChatRequest response = (ChatRequest) iis.readObject();
+				ChatRensponse response = (ChatRensponse) iis.readObject();
+				System.out.println(response);
 				// Check se il response code dà login ok o errore
-				
-				//
-				//agg
 				System.out.println("44");
 				
-				if(response.getError().equals("0")){
+				if(response.getResponseCode()==0){
 					// Errore di login
-					System.out.println("Impossibile effettuare il login con questo nickname");
-					nickname = null;
-					
+					System.out.println(response.getError());
+					nickname = null;			
 				}else{
-					System.out.println("Logged in as" + lineNick);
 					nickname = lineNick;
+					System.out.println(response.getError());
+					if(response.getResponseCode()==3)
+						active = true;
 				}
 			}
 			System.out.println("cycle 2");
-
-			while(true){
+			//temporaneo!!!!
+			active = true;
+			if(active == false){
+				ChatRensponse response = (ChatRensponse) iis.readObject();
+				if(response.getResponseCode()==3){
+					// Si è loggato anche il receiver
+					active = true;
+				}
+			}
+			
+			String receiver;
+			System.out.println("hey");
+			ChatMessage cm;
+			ChatRequest crMess;
+			
+			while(active == true){
 				String line = buffer.readLine();
-				String receiver = null;
-				
+				receiver = null;
+				System.out.println("Received: "+line);
 				if(line.equals("quit")){
+					active = false;
 					break;
 				}
 				// modifico la cosa sottostante con questo
@@ -98,14 +113,34 @@ public class SenderClient {
 					parts = line.split("\\:");
 					receiver = parts[0];
 				}
-				ChatMessage cm = new ChatMessage(line,nickname, receiver);
-				size = ChatRoom.addMessage(cm);
-				/*outbuffer.write(nickname+":"+line);
-				outbuffer.newLine();
-				outbuffer.flush();*/
+				//Creo nuovo messaggio
+				cm = new ChatMessage(line,nickname, receiver);
+				crMess = new ChatRequest(cm);
+				oos.writeObject(crMess);
+				oos.flush();
+				System.out.println("here");
+				System.out.println("here");
+				//Server response
+				ChatRensponse responseMess = new ChatRensponse();
 
-				String response = inbuffer.readLine();
-				System.out.println("Server risposta : " + response + "Message in position " + size);
+				System.out.println("Waiting for an answer.");
+				responseMess = (ChatRensponse) iis.readObject();
+				
+				if(responseMess.getResponseCode()==0){
+					// errore
+					System.out.println("Invio fallito" + responseMess.getError().toString());
+				}
+				else{
+					System.out.println("invio ok");
+					// messaggio inviato
+					//param = ArrayList<ChatMessage>.size()
+					System.out.println(responseMess.getParam());
+					System.out.println(responseMess.getError());
+					System.out.println(responseMess.getResponseCode());
+					size = (int) responseMess.getParam();
+					System.out.println("Invio messaggio eseguito con successo. Message in position " + size);
+				}
+				
 			}
 
 		}catch(Exception e){

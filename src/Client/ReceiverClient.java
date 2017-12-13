@@ -71,7 +71,7 @@ public class ReceiverClient {
 				chatRes = ChatRoom.getMessages(count, nickname);
 				// <--- to check, così potrei perdere dei messaggi
 				count = ChatRoom.addMessage(null);			
-				msg = (ArrayList<ChatMessage>) chatRes.getObject();
+				msg = (ArrayList<ChatMessage>) chatRes.getParam();
 
 				
 				for(ChatMessage ch: msg){

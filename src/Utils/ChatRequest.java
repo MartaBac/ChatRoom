@@ -2,10 +2,11 @@ package Utils;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import Server.ChatThread;
 
-public class ChatRequest {
+public class ChatRequest implements Serializable {
 	private String requestCode;
 	private String error;
 	private Object param;
@@ -27,6 +28,17 @@ public class ChatRequest {
 	public ChatRequest (String requestCode,Object p){
 		this.requestCode = requestCode;
 		param = p;	
+	}
+	
+	public ChatRequest (Object p){
+		requestCode = "";
+		error ="";
+		responseCode=0;
+		param = p;	
+		
+		if(p.getClass().equals(ChatMessage.class)){
+			requestCode = "addMessage";
+		}
 	}
 	
 	public String getRequestCode(){

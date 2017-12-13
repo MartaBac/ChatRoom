@@ -6,13 +6,14 @@ import Utils.ChatMessage;
 import Utils.ChatRensponse;
 
 public class ChatRoom {
-	public static ArrayList<ChatMessage> msg;
+	public static ArrayList<ChatMessage> msg = new ArrayList<ChatMessage>();;
 	/*Lista messaggi + ultimo progressivo
 	int synchronized addMessage(ChatMessage msg);
 	Ritorna il progressivo assegnato al messaggio
 	List<ChatMessage> listMessages(String chatUser, int lastMessage);
 	lastMessage può anche essere -1. In tal caso l’elenco dei messaggi contiene solo l’ultimo messaggio (pubblico o privato) destinato all’utente 
 */
+
 	public static ChatRensponse getMessages(int c, String nick) {
 		ArrayList<ChatMessage> list = new ArrayList<ChatMessage>();
 		ChatRensponse ret;
@@ -30,15 +31,18 @@ public class ChatRoom {
 		ret = new ChatRensponse(list);
 		// count!!
 		if(ret.getResponseCode()==0)
-			return (ChatRensponse) ret.getObject();
+			return (ChatRensponse) ret.getParam();
 		else{
 			System.out.println(ret.getError());
 			return null;
 		}
 	}
 	public static int addMessage(ChatMessage m) {
+		System.out.println("message m:" + m);
 		if(m!=null)
 			msg.add(m);
+		else
+			return -1;
 		return msg.size();
 	}
 
