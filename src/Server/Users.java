@@ -1,13 +1,26 @@
 package Server;
 
+import java.io.Serializable;
 
-public class Users {
+/*
+ *  Class that defines the parameters of the Users, such as their nickname, in which
+ * modes they are logged in and if they can join the chat. 
+ */
 
+public class Users   {
+	
 	    private String id;
 	    private boolean sender;
 	    private boolean receiver;
+	    
+	    // Active will be 'true' if the user is logged in both sender and receiver mode
 	    private boolean active;
 
+	    /*
+	     * Constructor that will set all the fields.
+	     * id = nickname, the first boolean represents sender status, the second one
+	     * the receiver one.
+	     */
 	    public Users (String id, boolean s, boolean r){
 	        this.setId(id);
 	        sender = s;
@@ -16,9 +29,11 @@ public class Users {
 	        	active = true;
 	        else
 	        	active = false;
-
 	    }
 	    
+	    /*
+	     *  Constructor that instantiate the nickname. The booleans are set to false.
+	     */
 	    public Users (String id){
 	    	this.setId(id);
 	    	sender = false;
@@ -26,7 +41,9 @@ public class Users {
 	    }
 	    
 	    /*
-	     *  If boolean is true -> sender; if false -> receiver
+	     * 	Initialize 'Users' id(String) to the first parameter, and set sender or 
+	     * receiver to true, logged.
+	     * If boolean is true -> sender; if false -> receiver.
 	     */
 	    public Users (String id, boolean x){
 	    	this.setId(id);
@@ -45,6 +62,10 @@ public class Users {
 	    	sender = s;
 	    }
 	    
+		public void setId(String id) {
+			this.id = id;
+		}
+	    
 	    public void setReceiver(boolean r){
 	    	receiver = r;
 	    }
@@ -61,17 +82,28 @@ public class Users {
 	    	return receiver;
 	    }
 	    
-	    public boolean isActive(){
+	    /*
+	     * Returns true if the user is logged in at least one mode.
+	     */
+	    public boolean isOn(){
 	    	if(receiver||sender == true)
 	    		return true;
 	    	else
 	    		return false;
 	    }
-	    public boolean isFullActive(){
-	    	if(receiver&&sender == true)
+	    
+	    /*
+	     * Returns true when 'user' is logged in both modes (=ready to join the chat).
+	     */
+	    public boolean isActive(){
+	    	if(receiver&&sender == true){
+	    		this.active=true;
 	    		return true;
-	    	else
+	    	}
+	    	else{
+	    		this.active=false;
 	    		return false;
+	    	}
 	    }
 	    
 	    public boolean getActive(){
@@ -81,8 +113,5 @@ public class Users {
 		public String getId() {
 			return id;
 		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
+		
 	}
