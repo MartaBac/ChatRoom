@@ -52,8 +52,9 @@ public class SenderClient {
 				is = s.getInputStream();
 				iis = new ObjectInputStream(is);
 				ChatRensponse response = (ChatRensponse) iis.readObject();
-				System.out.println("44");
-				System.out.println(response.getResponseCode()+(String) response.getError());
+				System.out.println("Server Response");
+				System.out.println(response.getResponseCode() + (String) response.getError());
+				System.out.println(response.getParam());
 				
 				/*
 				 *  If responseCode==0->login error; if responseCode==3 login successful;
@@ -83,35 +84,14 @@ public class SenderClient {
 				System.out.println("active?\t"+active);
 				System.out.println("Nickname?\t"+nickname);
 			}
-			
-		
-			// ChatThread periodically sends your status: waiting for it.		
-			ChatRensponse response = (ChatRensponse) iis.readObject();
-			
-			// Checks the response
-			System.out.println("check if active");
-			while(active==false){
-				System.out.println(active);
-				int res = response.getResponseCode();
-				//int res = ((ChatRensponse) iis.readObject()).getResponseCode();
-				if(res==5)
-					active = true;
-				else if(res==6)
-					active = false;
-				else
-					
-					// An unexpected ChatResponse has been read ->wait for the next one.
-					System.out.println("Uhandled error.");
-				
-				Thread.sleep(1000);
-				response = (ChatRensponse) iis.readObject();
-			}
-				
+
 			String receiver;
 			ChatMessage cm;
 			ChatRequest crMess;
 			
-			while(active == true){
+			
+			while(true){
+				System.out.println("Write a message: \n");
 				String line = buffer.readLine();
 				receiver = null;
 				System.out.println("Received: "+line);
@@ -130,48 +110,72 @@ public class SenderClient {
 						receiver = parts[0];
 					}
 				}
-				System.out.println("Message:"+line+"\t"+"at"+receiver+"from"+nickname);
+				System.out.println("Message:"+line+"\t"+"at\t"+receiver+"from\t"+nickname);
 				
 				/*
 				 *  Creates a ChatMessage that can be private or public,and a ChatRequest
 				 * to send it in chat.
-				 */		
-				cm = new ChatMessage(line,nickname, receiver);
-				crMess = new ChatRequest(cm);
-				oos.writeObject(crMess);
-				oos.flush();
-
-				// Waiting for the Server response
-				ChatRensponse responseMess = new ChatRensponse();
-				System.out.println("Waiting for an answer.");
-				responseMess = (ChatRensponse) iis.readObject();
-				int rs = responseMess.getResponseCode();
-				if(rs==0){
-					
-					// Server has returned a generic error; writing out error message.
-					System.out.println("Invio fallito:" 
-							+ responseMess.getError().toString());
+				 */
+				
+				ChatRensponse resAct = null ;			
+				System.out.println("Entering the cycle to get response");
+				System.out.println("Logged as \t" + nickname);
+				// Finchè non ricevo la risposta al questo thread
+				Object param = null;
+				while(param == null || !((String) param).equals(nickname)){
+					// Ricevo periodicamente aggiornamenti sullo stato dell'account da parte del thread
+					resAct = (ChatRensponse) iis.readObject();
+					param =  resAct.getParam();
+					System.out.println("I'm in");
+					System.out.println(param);
 				}
-				else{
-					if(rs==2){
-						System.out.println("invio ok");
+				System.out.println("Received response");
+							
+				if(resAct.getResponseCode()==5){
+					active = true;
+					cm = new ChatMessage(line,nickname, receiver);
+					crMess = new ChatRequest(cm);
+					oos.writeObject(crMess);
+					oos.flush();
+				
+					// Waiting for the Server response
+					ChatRensponse responseMess = new ChatRensponse();
+					System.out.println("Waiting for an answer.");
+					responseMess = (ChatRensponse) iis.readObject();
+					int rs = responseMess.getResponseCode();
+					if(rs==0){
 						
-						/*
-						 *  Message sent. The response contains the number (count)
-						 * associated to the message.
-						 */	
-						System.out.println(responseMess.getParam());
-						System.out.println(responseMess.getError());
-						System.out.println(responseMess.getResponseCode());
-						size = responseMess.getCount();
-						System.out.println("Invio messaggio eseguito con successo. "
-								+ "Messaggio in posizione: " + size);
+						// Server has returned a generic error; writing out error message.
+						System.out.println("Invio fallito:" 
+								+ responseMess.getError().toString());
 					}
 					else{
-						System.out.println("Error: unexpected answer from the server.");
+						if(rs==2){
+							System.out.println("invio ok");
+							
+							/*
+							 *  Message sent. The response contains the number (count)
+							 * associated to the message.
+							 */	
+							System.out.println(responseMess.getParam());
+							System.out.println(responseMess.getError());
+							System.out.println(responseMess.getResponseCode());
+							size = responseMess.getCount();
+							System.out.println("Invio messaggio eseguito con successo. "
+									+ "Messaggio in posizione: " + size);
+						}
+						else{
+							System.out.println("Error: unexpected answer from the server.");
+						}
+					}	
 					}
-				}			
+				else{
+					// Not active so i can't send messages
+					System.out.println("Account not active. Impossible to send messages.");
+					active = false;
+				}
 			}
+				
 
 		}catch(Exception e){
 			e.printStackTrace();

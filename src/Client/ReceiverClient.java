@@ -42,18 +42,21 @@ public class ReceiverClient {
 			
 			// Nickname request	
 			while (nickname==null){
-				System.out.println("Inserire un nickname valido per accedere alla chat in receiver mode");
+				System.out.println("Inserire un nickname valido per accedere alla chat in receiver mode:");
 				String lineNick = buffer.readLine();
+				
 				// Check nickname validity
 				System.out.println("letto");
 				chatRequest = new ChatRequest("loginrequestrc",lineNick);
 				oos.writeObject(chatRequest);
 				oos.flush();				
 				is = s.getInputStream();
-				iis = new ObjectInputStream(is);				
+				iis = new ObjectInputStream(is);	
+				
 				//Server response
 				ChatRensponse response = (ChatRensponse) iis.readObject();
 				System.out.println(response);
+				
 				// Check se il response code dà login ok o errore
 				System.out.println("44");
 				

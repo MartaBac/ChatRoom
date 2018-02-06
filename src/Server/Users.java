@@ -107,6 +107,7 @@ public class Users   {
 	    }
 	    
 	    public boolean getActive(){
+	    	active = receiver && sender;
 	    	return active;
 	    }
 

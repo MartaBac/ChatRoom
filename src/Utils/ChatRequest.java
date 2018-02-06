@@ -50,12 +50,12 @@ public class ChatRequest implements Serializable {
 		this.nickname = nickname;
 	}
 	
-	/*
+
 	public ChatRequest (String requestCode,String nickname){
 		this.requestCode = requestCode;	
 		this.nickname = nickname;
 	}
-	*/
+
 	/*
 	 *  Set param to the object given. If object.class = ChatMessage automaticcaly
 	 * sets requestcode for message adds.

@@ -57,6 +57,8 @@ public class ChatThread implements Runnable {
 					case "loginrequestrc":
 						cr = ChatThread.loginReceiver(param);
 						break;	
+						//togli?
+						/*
 					case "active?":
 						cr = new ChatRensponse();
 						if(ChatServer.utenti.get(request.getNick()).isActive()==true){				
@@ -65,13 +67,14 @@ public class ChatThread implements Runnable {
 						else
 							cr.setRensponseCode(7);
 						break;
+						*/
 				}
 				System.out.println("Switch ended.");
 				oos.writeObject(cr);
 				oos.flush();
 			}
 			cr = new ChatRensponse();
-			
+			cr.setParam(param);
 			
 			// Preparing chatResponse with response code 6 o 5 ( inactive, active )
 			if(act == false)
@@ -83,7 +86,7 @@ public class ChatThread implements Runnable {
 			oos.writeObject(cr);
 			oos.flush();
 			System.out.println("Checking if logged active." + type+ "  " + param);
-			boolean check = ChatServer.utenti.get(param).isActive();
+			boolean check = ChatServer.utenti.get(param).getActive();
 
 			// Waiting for the user to become active
 			while(check == false){	
@@ -91,6 +94,9 @@ public class ChatThread implements Runnable {
 				check = ChatServer.utenti.get(param).isActive();
 				System.out.println(check);
 				Thread.sleep(1000);	
+				cr.setRensponseCode(6);			
+				oos.writeObject(cr);
+				oos.flush();
 			}
 			cr.setRensponseCode(5);
 			
@@ -132,37 +138,6 @@ public class ChatThread implements Runnable {
 			oos.flush();
 			}
 			
-			// Wait for messages
-			/*
-			while(true){				
-				Object in = ois.readObject();
-				ChatRequest cReq = null;
-				if(!in.getClass().equals(ChatRequest.class)){
-					System.out.println("Fatal error. Unexpected input format");
-					
-				}
-				else{
-					cReq = (ChatRequest) in;
-				}
-				int count = -1;
-				ChatRensponse mess = new ChatRensponse();							
-				if(cReq.getParam().getClass().equals(ChatMessage.class) ){
-					ChatMessage cm = (ChatMessage) cReq.getParam();
-					count = ChatRoom.addMessage(cm);
-					mess.setParam(count);
-					if(count!=-1){	
-						mess.setError("Messaggio ricevuto con successo.",4);	
-					}
-					else{
-						mess.setError("Errore invio messaggio.",5);
-					}
-				}
-				oos.writeObject(mess);
-				oos.flush();
-				
-
-			}
-			*/
 		}catch(Exception e ){
 			System.out.println("ChatTread Exception:" + e.getMessage());
 			e.printStackTrace();
