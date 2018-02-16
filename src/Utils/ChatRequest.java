@@ -8,8 +8,14 @@ package Utils;
 import java.io.Serializable;
 
 public class ChatRequest implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/*
-	 * request code 7 = am I active?
+	 * request code =  isactive
+	 * request code = sendmessage
 	 */
 	private String requestCode;
 	private String nickname;

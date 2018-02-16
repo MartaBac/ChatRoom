@@ -10,6 +10,10 @@ import java.util.ArrayList;
 
 public class ChatRensponse implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Object param;
 	/*
 	 * Response codes:
@@ -38,8 +42,8 @@ public class ChatRensponse implements Serializable {
 	 * to this list and the response code to '+1', message list.
 	 */
 	public ChatRensponse (Object p){
-		ArrayList<ChatMessage> k = null;
-    	if(p.getClass().equals(k.getClass())){
+		ArrayList<ChatMessage> k = new ArrayList<ChatMessage>();
+    	if(p.getClass().equals(k)){
     		this.param = p ;
     		// c'era scritto 0, ma credo fosse un errore
     		responseCode = 1;

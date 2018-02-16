@@ -1,7 +1,5 @@
 package Server;
 
-import java.io.Serializable;
-
 /*
  *  Class that defines the parameters of the Users, such as their nickname, in which
  * modes they are logged in and if they can join the chat. 
@@ -51,7 +49,7 @@ public class Users   {
 	    		sender = true;
 	    		receiver = false;
 	    	}
-	    	else{
+	    	else if(x==true){
 	    		receiver = true;
 	    		sender = false;
 	    	}

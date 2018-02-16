@@ -73,36 +73,41 @@ public class ReceiverClient {
 			}
 			
 			System.out.println("cycle 2");
-
+			ChatRequest act = new ChatRequest("isactive", nickname);
 			// To start receiver's routine, the account must be activated logging in also in sender mode
 			while(active == false){
-				System.out.println("Waiting for sender to log in.");
+				oos.writeObject(act);
+				oos.flush();
+				System.out.println("Waiting server response.");
+				is = s.getInputStream();
+				iis = new ObjectInputStream(is);
 				ChatRensponse response = (ChatRensponse) iis.readObject();
-				if(response.getResponseCode()==3){
-					// Si è loggato anche il receiver
-					System.out.println("receiver logged in");
+				if(response.getResponseCode()==5){
+					// Si è loggato anche il sender
+					System.out.println("Account active");
 					active = true;
 				}
 				else{
-					System.out.println("Receiver still not logged ");
+					System.out.println("Sender still not logged ");
 					
 				}
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			}
 				
-
-			System.out.println("cycle 2_rec  "+ nickname + "-33-"+ ChatServer.utenti.get(nickname));
+			is = s.getInputStream();
+			iis = new ObjectInputStream(is);
+			System.out.println("cycle 2_rec  "+ nickname );
 			// Cycle that must be interrupted if receiver or/and sender log out
 			while(active==true){	
 				// Request to download the new messages
-				os = s.getOutputStream();			
-				oos = new ObjectOutputStream(os);
+				System.out.println("Inside the while <3");
+				//os = s.getOutputStream();			
+				//oos = new ObjectOutputStream(os);
 				req = new ChatRequest("getmessages", count, nickname);
 				oos.writeObject(req);
 				oos.flush();
 
-				is = s.getInputStream();
-				iis = new ObjectInputStream(is);
+				
 				// Server response
 				ChatRensponse ob = (ChatRensponse) iis.readObject();
 				// If there is no new messages
@@ -122,6 +127,7 @@ public class ReceiverClient {
 				for(ChatMessage ch: msg){
 					System.out.println(ch.getMessage());
 				}
+				Thread.sleep(2000);
 			}
 			
 		}catch(Exception e){

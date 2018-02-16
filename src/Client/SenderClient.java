@@ -21,20 +21,25 @@ public class SenderClient {
 		Socket s = new Socket();
 		String nickname = null;
 		boolean active = false;
-		ChatRequest cr;	
+		ChatRequest cr = null;	
 		int size =-1;	
+		
+		// Output channel to communicate from client to server
+		OutputStream os = null;		
+		ObjectOutputStream oos = null;
+		
 		try {
 			s.connect(addr);
-			ObjectInputStream iis = null;
+			ObjectInputStream ois = null;
 			InputStreamReader reader = new InputStreamReader(System.in);
-			BufferedReader buffer = new BufferedReader(reader);
-			
-			// Output channel to communicate from client to server
-			OutputStream os = s.getOutputStream();		
-			ObjectOutputStream oos = new ObjectOutputStream(os);
+			BufferedReader buffer = new BufferedReader(reader);	
 			
 			// Output channel to communicate from server to client
-			InputStream is = s.getInputStream();
+			InputStream is = null;
+			
+			// Write the message to send a login request to the server
+			os = s.getOutputStream();
+			oos = new ObjectOutputStream(os);
 			
 			// Nickname request
 			while (nickname==null){
@@ -42,18 +47,15 @@ public class SenderClient {
 				String lineNick = buffer.readLine();
 				
 				// New ChatRequest to check if it's a valid nickname to log with
-				cr = new ChatRequest("loginrequestsd",lineNick);
-				
-				// Write the message to send a login request to the server
+				cr = new ChatRequest("loginrequestsd",lineNick);			
 				oos.writeObject(cr);
 				oos.flush();
 				
 				// Waiting server response
 				is = s.getInputStream();
-				iis = new ObjectInputStream(is);
-				ChatRensponse response = (ChatRensponse) iis.readObject();
-				System.out.println("Server Response");
-				System.out.println(response.getResponseCode() + (String) response.getError());
+				ois = new ObjectInputStream(is);
+				ChatRensponse response = (ChatRensponse) ois.readObject();
+				System.out.println("Server Response" + response.getResponseCode() + (String) response.getError());
 				System.out.println(response.getParam());
 				
 				/*
@@ -88,8 +90,7 @@ public class SenderClient {
 			String receiver;
 			ChatMessage cm;
 			ChatRequest crMess;
-			
-			
+					
 			while(true){
 				System.out.println("Write a message: \n");
 				String line = buffer.readLine();
@@ -102,7 +103,7 @@ public class SenderClient {
 				else{
 					if(line.charAt(0)=='@'){
 						
-					// I'm sending a private message
+						// I'm sending a private message
 						String[] parts;
 						parts = line.split("\\:");
 						
@@ -118,30 +119,45 @@ public class SenderClient {
 				 */
 				
 				ChatRensponse resAct = null ;			
-				System.out.println("Entering the cycle to get response");
 				System.out.println("Logged as \t" + nickname);
 				// Finchè non ricevo la risposta al questo thread
-				Object param = null;
-				while(param == null || !((String) param).equals(nickname)){
-					// Ricevo periodicamente aggiornamenti sullo stato dell'account da parte del thread
-					resAct = (ChatRensponse) iis.readObject();
+				Object param = "";
+				ChatRequest req = new ChatRequest("isactive", nickname);
+							
+				while(param == null || !((String) param).equals(nickname)){				
+					System.out.println("Going to enter while:"+ param +" "+(String) param);
+					System.out.println("Start While. req: " + req.getRequestCode() + " " + req.getNick());
+					oos.writeObject(req);
+					oos.flush();
+					System.out.println("wrote");				
+					is = s.getInputStream();
+					ois = new ObjectInputStream(is);				
+					resAct = (ChatRensponse) ois.readObject();				
+					System.out.println("read");
 					param =  resAct.getParam();
 					System.out.println("I'm in");
-					System.out.println(param);
+					System.out.println(param);				
+					Thread.sleep(1000);
 				}
 				System.out.println("Received response");
 							
 				if(resAct.getResponseCode()==5){
 					active = true;
+					System.out.println("Creating chat message : line - "+ line + "nickname - " + nickname +"-receiver"+ receiver);
 					cm = new ChatMessage(line,nickname, receiver);
-					crMess = new ChatRequest(cm);
+					crMess = new ChatRequest( "sendmessage", cm);
+					
 					oos.writeObject(crMess);
 					oos.flush();
 				
+					System.out.println("Chat message sent");
 					// Waiting for the Server response
 					ChatRensponse responseMess = new ChatRensponse();
 					System.out.println("Waiting for an answer.");
-					responseMess = (ChatRensponse) iis.readObject();
+					is = s.getInputStream();
+					ois = new ObjectInputStream(is);
+					responseMess = (ChatRensponse) ois.readObject();
+					System.out.println("Response received");
 					int rs = responseMess.getResponseCode();
 					if(rs==0){
 						
@@ -174,9 +190,7 @@ public class SenderClient {
 					System.out.println("Account not active. Impossible to send messages.");
 					active = false;
 				}
-			}
-				
-
+			}				
 		}catch(Exception e){
 			e.printStackTrace();
 		}	

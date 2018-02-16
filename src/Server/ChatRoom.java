@@ -16,31 +16,37 @@ public class ChatRoom {
 */
 
 	public static ChatUpdate getMessages(int c, String nick) {
+		System.out.println("ChatRoom getMessages");
 		ArrayList<ChatMessage> list = new ArrayList<ChatMessage>();
 		ChatRensponse ret;
 		int i = 0;
 		int count = c;
 		ChatUpdate cu=null;
-
+		System.out.println("Entering loop");
 		for(ChatMessage ch : msg){
+			System.out.println("In loop");
 			if(count<=i &&(ch.getReceiver()==null||ch.getReceiver().equals(nick))){
 				list.add(ch);
 			}
 		i++;
 		}	
+		System.out.println("Out loop");
 		count = msg.size();
-		
+		System.out.println(count);
 		ret = new ChatRensponse(list);
 		// count!!
-		if(ret.getResponseCode()==0){
+		if(ret.getResponseCode()==1){
 			//
 			cu = new ChatUpdate(list,i);
 			return cu;
 		}
 			//return (ChatRensponse) ret.getParam();
 		else{
+			System.out.println("Get Messages failed");
+			System.out.println(ret.getResponseCode());
 			System.out.println(ret.getError());
-			return null;
+			cu = new ChatUpdate(null,-1);
+			return cu;
 		}
 		
 	}

@@ -10,17 +10,28 @@ import Utils.ChatMessage;
 public class ChatUpdate  {
 	ArrayList<ChatMessage> list;
 	int count;
+	boolean avaiable;
 	
     public ChatUpdate (ArrayList<ChatMessage> list, int count){
-        this.list = list;
-        this.count = count;
+    	if(list!=null){
+    		this.list = list;
+    		this.count = count;
+    		avaiable = true;
+    		}
+    	else
+    		avaiable = false;
 
     }
     public int getCount(){
     	return this.count;
     }
     
+    public boolean getAvaiable(){
+    	return avaiable;
+    }
+    
     public ArrayList<ChatMessage> getMessages(){
+    	System.out.println("List: " + list);
     	return this.list;
     }
 }
