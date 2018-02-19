@@ -119,9 +119,8 @@ public class ReceiverClient {
 						System.out.println("Unexpected server response format.");
 						continue;
 					}
-				//System.out.println("ResponseCode = 1");
-				// Getting new messages and updating count
-			
+				
+				// I'm sure i'm getting that
 				msg = (ArrayList<ChatMessage>) ob.getParam();
 							
 				count = ob.getCount();

@@ -27,7 +27,6 @@ public class SenderClient {
 		// Output channel to communicate from client to server
 		OutputStream os = null;		
 		ObjectOutputStream oos = null;
-		
 		ObjectInputStream ois = null;
 		InputStream is = null;
 		
@@ -43,7 +42,7 @@ public class SenderClient {
 			
 			// Nickname request
 			while (nickname==null){
-				System.out.println("Inserire un nickname valido per accedere alla chat");
+				System.out.println("Inserire un nickname valido per accedere alla chat:");
 				String lineNick = buffer.readLine();
 				
 				// New ChatRequest to check if it's a valid nickname to log with
@@ -55,8 +54,7 @@ public class SenderClient {
 				is = s.getInputStream();
 				ois = new ObjectInputStream(is);
 				ChatRensponse response = (ChatRensponse) ois.readObject();
-				System.out.println("Server Response" + response.getResponseCode() + (String) response.getError());
-				System.out.println(response.getParam());
+				System.out.println("Server response: " + (String) response.getError());
 				
 				/*
 				 *  If responseCode==0->login error; if responseCode==3 login successful;
@@ -65,26 +63,23 @@ public class SenderClient {
 				if(response.getResponseCode()==0){
 					
 					// Login error, nickname not set & re-ask for a nickname
-					System.out.println(response.getError());
 					nickname = null;	
 					continue;
 				}else{
 					
 					// Successfully logged in sender mode
+					System.out.println("You successfully logged in sender mode. Write '\\help' to see chat options.");
 					if(response.getResponseCode()==3){
 						nickname = lineNick;	
-						System.out.println("response error"+response.getError());
-						System.out.println("response code"+response.getResponseCode());
 					}
 					else{
 		
 						// Generic error, ask again for a valid nickname
 						System.out.println("Error logging in: unknown error.");
+						nickname = null;
 						continue;
 					}
 				}
-				System.out.println("active?\t"+active);
-				System.out.println("Nickname?\t"+nickname);
 			}
 			String receiver;
 			ChatMessage cm;
@@ -94,7 +89,7 @@ public class SenderClient {
 				System.out.println("Write a message: \n");
 				String line = buffer.readLine();
 				receiver = null;
-				System.out.println("Received: "+line);
+
 				if(line.equals("quit")){
 					active = false;
 					break;
@@ -108,7 +103,6 @@ public class SenderClient {
 						
 						// Setting receiver name (in case of public msg = null)
 						receiver = parts[0].substring(1, parts[0].length());
-						System.out.println("7777777777777777" + parts[1]);
 						line = parts[1];
 					}
 				}
