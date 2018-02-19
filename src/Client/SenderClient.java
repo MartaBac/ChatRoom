@@ -28,16 +28,16 @@ public class SenderClient {
 		OutputStream os = null;		
 		ObjectOutputStream oos = null;
 		
+		ObjectInputStream ois = null;
+		InputStream is = null;
+		
 		try {
 			s.connect(addr);
-			ObjectInputStream ois = null;
+			
 			InputStreamReader reader = new InputStreamReader(System.in);
 			BufferedReader buffer = new BufferedReader(reader);	
 			
 			// Output channel to communicate from server to client
-			InputStream is = null;
-			
-			// Write the message to send a login request to the server
 			os = s.getOutputStream();
 			oos = new ObjectOutputStream(os);
 			
@@ -77,7 +77,7 @@ public class SenderClient {
 						System.out.println("response code"+response.getResponseCode());
 					}
 					else{
-			
+		
 						// Generic error, ask again for a valid nickname
 						System.out.println("Error logging in: unknown error.");
 						continue;
@@ -86,7 +86,6 @@ public class SenderClient {
 				System.out.println("active?\t"+active);
 				System.out.println("Nickname?\t"+nickname);
 			}
-
 			String receiver;
 			ChatMessage cm;
 			ChatRequest crMess;
@@ -108,7 +107,9 @@ public class SenderClient {
 						parts = line.split("\\:");
 						
 						// Setting receiver name (in case of public msg = null)
-						receiver = parts[0];
+						receiver = parts[0].substring(1, parts[0].length());
+						System.out.println("7777777777777777" + parts[1]);
+						line = parts[1];
 					}
 				}
 				System.out.println("Message:"+line+"\t"+"at\t"+receiver+"from\t"+nickname);
@@ -145,8 +146,8 @@ public class SenderClient {
 					active = true;
 					System.out.println("Creating chat message : line - "+ line + "nickname - " + nickname +"-receiver"+ receiver);
 					cm = new ChatMessage(line,nickname, receiver);
-					crMess = new ChatRequest( "sendmessage", cm);
-					
+					crMess = new ChatRequest( "addmessages", cm);
+					crMess.setNick(nickname);
 					oos.writeObject(crMess);
 					oos.flush();
 				

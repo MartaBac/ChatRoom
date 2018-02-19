@@ -19,7 +19,7 @@ public class ChatRensponse implements Serializable {
 	 * Response codes:
 	 * -1 error
 	 * 0 login error
-	 * +1 messages list
+	 * +1 message list
 	 * +2 index of the message added
 	 * +3 logged in sender mode
 	 * +4 logged in receiver mode
@@ -43,9 +43,10 @@ public class ChatRensponse implements Serializable {
 	 */
 	public ChatRensponse (Object p){
 		ArrayList<ChatMessage> k = new ArrayList<ChatMessage>();
-    	if(p.getClass().equals(k)){
+		System.out.println("ChatResponse creation: "+ p.getClass() + "\t" + k.getClass());
+    	if(p.getClass().equals(k.getClass())){
     		this.param = p ;
-    		// c'era scritto 0, ma credo fosse un errore
+
     		responseCode = 1;
     	}
     	else {

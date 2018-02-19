@@ -33,6 +33,7 @@ public class ChatThread implements Runnable {
 	OutputStream os = null;
 	ObjectInputStream ois = null;
 	ObjectOutputStream oos = null;
+	ChatMessage msg = null;
 	type = null;	
 		try{		
 			
@@ -53,6 +54,9 @@ public class ChatThread implements Runnable {
 				System.out.println(request.getRequestCode());
 				code = request.getRequestCode();
 				param = (String) request.getNick();
+
+				
+				
 				System.out.println("Execute: "+code+param);
 				
 				// Requests sorting
@@ -81,16 +85,13 @@ public class ChatThread implements Runnable {
 						break;
 						
 					case "getmessages":
-						if(type!="receiver"){
-							System.out.println("Error: not logged as receiver.");
-							break;
-						}
+
 						if(ChatServer.utenti.get(param).getActive()==false){
 							System.out.println("Unable to send the message: your account is not active.");
 							break;
 						}
 						// Se attivo e receiver
-						System.out.println(type + "get messages :-D");
+						System.out.println(type + ": \t get messages :-D");
 						System.out.println(request.getParam());
 						System.out.println(request.getNick());
 						cr = getMessages((int) request.getParam(), request.getNick());
@@ -99,19 +100,17 @@ public class ChatThread implements Runnable {
 						
 					case "addmessages":
 						System.out.println(type + "add message :-)");
-						if(type != "sender"){
-							System.out.println("Error: you have not the permission to send messages.");
-							break;
-						}
+
 						if(ChatServer.utenti.get(param).getActive()==false){
 							System.out.println("Unable to send the message: your account is not active.");
 							break;
 						}
 						// Se sono loggato come sender e attivo:
 						ChatMessage cm = (ChatMessage) request.getParam();
-						String r = cm.getReceiver();
-						int c = -1;
-						System.out.println("r:"+r);
+						
+						// aggiunge il messaggio e ritorna l'indice
+						int c = ChatRoom.addMessage(cm);
+						System.out.println("Receiver:"+cm.getReceiver());
 						cr = new ChatRensponse(2,c);
 						break;					
 				}
@@ -269,6 +268,7 @@ public class ChatThread implements Runnable {
 		ArrayList<ChatMessage> msg = new ArrayList<ChatMessage>();
 		ChatUpdate cu =  ChatRoom.getMessages(count,nick);
 		// If there has been an error: getMessages returns a null value
+		System.out.println("ChatUpdate in ChatThread-getMessages: " + cu.getCount() + "available/mess :" + cu.getAvaiable() );
 		
 		if(cu.getAvaiable()==false){
 			System.out.println("No new messages.");
@@ -277,14 +277,17 @@ public class ChatThread implements Runnable {
 		System.out.println("cu:"+cu);
 		// Lista messaggi da aggiungere nella chat del receiver
 		System.out.println(cu.getCount() + "--" + cu.getClass() + "--" + cu.getMessages());
-		msg = cu.getMessages();
-		int c = cu.getCount();
-		
-		cre = new ChatRensponse(msg);
-		cre.setCount(c);
-		if(cre.getResponseCode()!=-1){
-			cre.setRensponseCode(1);
+
+
+		cre = new ChatRensponse(cu.getMessages());
+		cre.setCount(cu.getCount());
+		if(cre.getResponseCode()==-1){
+			System.out.println("5555");
+			System.out.println("Error. Unexpected object format.");
 		}
+		else if(cre.getResponseCode() == 1)
+			System.out.println("Chat Response contains an object: ArrayList<ChatMessages>");
+		
 		return cre;
 				
 		

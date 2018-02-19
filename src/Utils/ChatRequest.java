@@ -84,6 +84,10 @@ public class ChatRequest implements Serializable {
 		return param;
 	}
 	
+	public void setNick(String nick){
+		this.nickname = nick;
+	}
+	
 	public String getNick(){
 		return nickname;
 	}

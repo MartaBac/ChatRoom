@@ -11,7 +11,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import Server.ChatServer;
 import Utils.ChatMessage;
 import Utils.ChatRensponse;
 import Utils.ChatRequest;
@@ -23,6 +22,7 @@ public class ReceiverClient {
 		ArrayList<ChatMessage> msg = new ArrayList<ChatMessage>();
 		String ipaddr = args[0];
 		String nickname = null;
+		ChatRensponse ob;
 		InetSocketAddress addr  = new InetSocketAddress(ipaddr, port);
 		Socket s = new Socket();
 		boolean active = false;
@@ -72,7 +72,6 @@ public class ReceiverClient {
 				}		
 			}
 			
-			System.out.println("cycle 2");
 			ChatRequest act = new ChatRequest("isactive", nickname);
 			// To start receiver's routine, the account must be activated logging in also in sender mode
 			while(active == false){
@@ -93,41 +92,50 @@ public class ReceiverClient {
 				}
 				Thread.sleep(2000);
 			}
-				
-			is = s.getInputStream();
-			iis = new ObjectInputStream(is);
-			System.out.println("cycle 2_rec  "+ nickname );
+							
+			System.out.println("Chat active: waiting for new messages");
 			// Cycle that must be interrupted if receiver or/and sender log out
 			while(active==true){	
+
 				// Request to download the new messages
-				System.out.println("Inside the while <3");
-				//os = s.getOutputStream();			
-				//oos = new ObjectOutputStream(os);
 				req = new ChatRequest("getmessages", count, nickname);
 				oos.writeObject(req);
 				oos.flush();
-
 				
 				// Server response
-				ChatRensponse ob = (ChatRensponse) iis.readObject();
+				is = s.getInputStream();
+				iis = new ObjectInputStream(is);
+				
+				ob = (ChatRensponse) iis.readObject();
 				// If there is no new messages
-				if(ob.getResponseCode()==-1)
+				if(ob.getResponseCode()==-1){
+					System.out.println("No new message");
 					continue;
+				}
+					
 				else
 					// Handling unexpected responses
 					if(ob.getResponseCode()!=1){
 						System.out.println("Unexpected server response format.");
 						continue;
 					}
-				// Getting new messages and updating count	
+				//System.out.println("ResponseCode = 1");
+				// Getting new messages and updating count
+			
 				msg = (ArrayList<ChatMessage>) ob.getParam();
+							
 				count = ob.getCount();
-				
 				// Write on receiver's terminal the new messages (public AND private)
 				for(ChatMessage ch: msg){
-					System.out.println(ch.getMessage());
+					
+					if(ch.getReceiver()!=null){
+						System.out.println("@" + ch.getSender() + ":" + ch.getMessage());
+					}
+					else{
+						System.out.println(ch.getMessage());
+					}
 				}
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			}
 			
 		}catch(Exception e){
@@ -137,3 +145,4 @@ public class ReceiverClient {
 	}
 
 }
+
