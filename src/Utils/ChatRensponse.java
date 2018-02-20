@@ -61,8 +61,7 @@ public class ChatRensponse implements Serializable {
 	 */
 	public ChatRensponse (String error, int rcode){
 		this.error = error;
-		this.responseCode = rcode;
-		
+		this.responseCode = rcode;	
 	}
 	
 	/*
@@ -70,8 +69,7 @@ public class ChatRensponse implements Serializable {
 	 */
 	public ChatRensponse (int responseCode, int count){
 		this.responseCode = responseCode;
-		this.count = count;
-		
+		this.count = count;	
 	}
 	
 	/*

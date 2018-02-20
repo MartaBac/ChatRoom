@@ -3,7 +3,6 @@ package Server;
 import java.util.ArrayList;
 
 import Utils.ChatMessage;
-import Utils.ChatRensponse;
 
 public class ChatRoom {
 	public static ArrayList<ChatMessage> msg = new ArrayList<ChatMessage>();
@@ -16,55 +15,25 @@ public class ChatRoom {
 */
 
 	public static ChatUpdate getMessages(int c, String nick) {
-		ChatUpdate cu=null;
-		
-		if(msg.size() < c || msg.size() == 0){
+		ChatUpdate cu=null;	
+		if(msg.size() <= c || msg.size() == 0){
 			System.out.println("No new messages available");
 			cu = new ChatUpdate(null, c);
 			return cu;
 		}
-		
-		System.out.println("ChatRoom getMessages");
 		ArrayList<ChatMessage> list = new ArrayList<ChatMessage>();
-		ChatRensponse ret;
 		int i = 0;
 		int count = c;
-
-		
-		System.out.println("Entering loop");
 		for(ChatMessage ch : msg){
-			System.out.println("In loop");
-			System.out.println("Receiver: " + ch.getReceiver());
-			if(count<=i &&(ch.getReceiver()==null||ch.getReceiver().equals(nick))){
+			if((count == -1 || count <= i) &&(ch.getReceiver()==null||ch.getReceiver().equals(nick))){
 				list.add(ch);
-				
 			}
 		i++;
 		}	
-		System.out.println("Out loop");
-		count = msg.size();
-		System.out.println(count);
-		// ret = new ChatRensponse(list); <--- ??
-		// count!!
-		/*if(ret.getResponseCode()==1){
-			//
-			cu = new ChatUpdate(list,i);
-			return cu;
-		}
-			//return (ChatRensponse) ret.getParam();
-		else{
-			System.out.println("Get Messages failed");
-			System.out.println(ret.getResponseCode());
-			System.out.println(ret.getError());
-			cu = new ChatUpdate(null,-1);
-			return cu;
-		}*/
-		
+		count = msg.size();	
 		cu = new ChatUpdate(list,i);
-		return cu;
-		
+		return cu;	
 	}
-	
 	
 	
 	public static int addMessage(ChatMessage m) {

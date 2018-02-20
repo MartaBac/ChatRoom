@@ -94,6 +94,7 @@ public class Users   {
 	     * Returns true when 'user' is logged in both modes (=ready to join the chat).
 	     */
 	    public boolean isActive(){
+	    	System.out.println("Checking if active; receiver: "+receiver + " sender: " + sender); 
 	    	if(receiver&&sender == true){
 	    		this.active=true;
 	    		return true;

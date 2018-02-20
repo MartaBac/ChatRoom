@@ -20,7 +20,6 @@ public class SenderClient {
 		InetSocketAddress addr  = new InetSocketAddress(ipaddr, port);
 		Socket s = new Socket();
 		String nickname = null;
-		boolean active = false;
 		ChatRequest cr = null;	
 		int size =-1;	
 		
@@ -31,8 +30,7 @@ public class SenderClient {
 		InputStream is = null;
 		
 		try {
-			s.connect(addr);
-			
+			s.connect(addr);	
 			InputStreamReader reader = new InputStreamReader(System.in);
 			BufferedReader buffer = new BufferedReader(reader);	
 			
@@ -91,7 +89,16 @@ public class SenderClient {
 				receiver = null;
 
 				if(line.equals("quit")){
-					active = false;
+					ChatRequest logout = new ChatRequest("quit",nickname);
+					logout.setParam("sender");
+					System.out.println("Request of logout sent.");
+					System.out.println(logout.getNick() + logout.getRequestCode());
+					oos.writeObject(logout);
+					oos.flush();
+					is = s.getInputStream();
+					ois = new ObjectInputStream(is);				
+					ChatRensponse quit = (ChatRensponse) ois.readObject();
+					System.out.println("Quit response: " +(String) quit.getError() + quit.getResponseCode()); 				
 					break;
 				}
 				else{
@@ -137,7 +144,6 @@ public class SenderClient {
 				System.out.println("Received response");
 							
 				if(resAct.getResponseCode()==5){
-					active = true;
 					System.out.println("Creating chat message : line - "+ line + "nickname - " + nickname +"-receiver"+ receiver);
 					cm = new ChatMessage(line,nickname, receiver);
 					crMess = new ChatRequest( "addmessages", cm);
@@ -183,7 +189,6 @@ public class SenderClient {
 				else{
 					// Not active so i can't send messages
 					System.out.println("Account not active. Impossible to send messages.");
-					active = false;
 				}
 			}				
 		}catch(Exception e){

@@ -30,26 +30,21 @@ public class ChatThread implements Runnable {
 	OutputStream os = null;
 	ObjectInputStream ois = null;
 	ObjectOutputStream oos = null;
-
-	type = null;	
-		try{		
-			
-			System.out.println("New thread");			
-			
+	type = null;
+	
+		try{					
+			System.out.println("New thread");					
 			is = client.getInputStream();
 			ois = new ObjectInputStream(is);
-			
+			Object o;		
 			while(!exit){		
-				
-			// Read object from input stream			
-			// Login
 				System.out.println("While ON");		
-				Object o = ois.readObject();
+				o = ois.readObject();
 				request = (ChatRequest) o;
 				code = request.getRequestCode();
 				param = (String) request.getNick();		
 				System.out.println("Execute: "+code+param);
-				
+				System.out.println("-------- " + code);
 				// Requests sorting
 				switch (code){
 					case "loginrequestsd":
@@ -71,12 +66,28 @@ public class ChatThread implements Runnable {
 						
 					case "quit":
 						System.out.println("Logging out.");
+						if(request.getParam().toString().equals("receiver"))
+							ChatServer.utenti.get(param).setReceiver(false);
+						else {
+								if(request.getParam().toString().equals("sender"))
+									ChatServer.utenti.get(param).setReceiver(false);
+								else{
+									System.out.println("Error: param not recognizable: logging out from both modes.");
+									ChatServer.utenti.get(param).setReceiver(false);
+									ChatServer.utenti.get(param).setSender(false);
+								}
+						}
+						cr = new ChatRensponse();
+						cr.setRensponseCode(6);
+						cr.setError("Account correctly disabled");		
+						os = this.client.getOutputStream();		
 						exit = true;						
 						break;
 						
 					case "getmessages":
 						if(ChatServer.utenti.get(param).getActive()==false){
-							System.out.println("Unable to send the message: your account is not active.");
+							cr.setError("Unable to get the messages: your account is not active.");
+							cr.setRensponseCode(6);
 							break;
 						}
 						cr = getMessages((int) request.getParam(), request.getNick());

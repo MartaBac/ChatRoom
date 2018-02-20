@@ -14,6 +14,7 @@ public class ChatRequest implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	/*
+	 * request code =  quit -> param contains if send or receiver
 	 * request code =  isactive
 	 * request code = sendmessage
 	 */
@@ -82,6 +83,10 @@ public class ChatRequest implements Serializable {
 	}
 	public Object getParam(){
 		return param;
+	}
+	
+	public void setParam(Object o){
+		this.param = o;
 	}
 	
 	public void setNick(String nick){
