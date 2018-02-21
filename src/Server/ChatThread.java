@@ -37,14 +37,12 @@ public class ChatThread implements Runnable {
 			is = client.getInputStream();
 			ois = new ObjectInputStream(is);
 			Object o;		
-			while(!exit){		
-				System.out.println("While ON");		
+			while(!exit){			
 				o = ois.readObject();
 				request = (ChatRequest) o;
 				code = request.getRequestCode();
 				param = (String) request.getNick();		
-				System.out.println("Execute: "+code+param);
-				System.out.println("-------- " + code);
+				System.out.println("Execute: "+code+ " of "+ param);
 				// Requests sorting
 				switch (code){
 					case "loginrequestsd":
@@ -61,7 +59,6 @@ public class ChatThread implements Runnable {
 							cr.setRensponseCode(5);
 						else
 							cr.setRensponseCode(6);
-						System.out.println(param + " is active result:\t" + cr.getResponseCode());
 						break;
 						
 					case "quit":
@@ -125,11 +122,8 @@ public class ChatThread implements Runnable {
 	 *  if logged in sender mode and active;= 0 if login failed,already logged as sender.
 	 */
 	public static ChatRensponse loginSender(String param) throws IOException{
-		System.out.println(type + "Logging sender " + param);
-		System.out.println(type + "Start Sender with param: " + param);
 		Users check = null;
-		ChatRensponse k = new ChatRensponse();
-		
+		ChatRensponse k = new ChatRensponse();	
 		Users u=  new Users( param, false); // 'false' = sender mode
 		
 		/*
@@ -176,12 +170,10 @@ public class ChatThread implements Runnable {
 		
 		// Sets that you are logged as sender.
 		type = "sender";
-		System.out.println(type + "returning sender response code: \t"+k.getResponseCode() + "and count \t"  +k.getCount());	
 		return k;
 	}
 	
 	public static ChatRensponse loginReceiver(String param) throws IOException{
-		System.out.println(type + "Logging receiver " + param);
 		Users check = null;
 		ChatRensponse k = new ChatRensponse();
 		Users u=  new Users( param, true);
@@ -190,7 +182,7 @@ public class ChatThread implements Runnable {
 		
 		// Case for which the record wasn't in memory (-> for sure not active)
 		if(check == null){		
-			k.setError(type + "Logged in receiver mode.");
+			k.setError("Logged in receiver mode.");
 			k.setRensponseCode(4);
 			ChatServer.utenti.get(param).setActive(false);
 			}
@@ -202,20 +194,21 @@ public class ChatThread implements Runnable {
 				ChatServer.utenti.get(param).setReceiver(true);
 				if(ChatServer.utenti.get(param).getSender()==true){
 					ChatServer.utenti.get(param).setActive(true);
-					k.setError(type + "Logged in receiver mode. Active.");
+					k.setError("Logged in receiver mode. Active.");
 				}
 				else{
 					ChatServer.utenti.get(param).setActive(false);
-					k.setError(type + "Logged in receiver mode. Not active.");
+					k.setError("Logged in receiver mode. Not active.");
 				}
 				k.setRensponseCode(4);
 			}
 			
 			// Record already in memory and user logged in receiver mode
 			else{
-				System.out.println(type + "Error logging in. Someone else is already logged with this nickname in receiver mode");
-				//error logging in
-				k.setError(type + "Someone already logged with the selected nickname.");
+				System.out.println("Error logging in. Someone else is already logged with this nickname in receiver mode");
+				
+				// Error logging in
+				k.setError("Someone already logged with the selected nickname.");
 				k.setRensponseCode(0);
 				return k;
 			}
@@ -226,12 +219,7 @@ public class ChatThread implements Runnable {
 	
 	public static ChatRensponse getMessages(int count, String nick){		
 		ChatRensponse cre;
-		System.out.println("count:"+count+"nick"+nick);
 		ChatUpdate cu =  ChatRoom.getMessages(count,nick);
-		
-		// If there has been an error: getMessages returns a null value
-		System.out.println("ChatUpdate in ChatThread-getMessages: " + cu.getCount() + "available/mess :" + cu.getAvaiable() );
-	
 		if(cu.getAvaiable()==false){
 			return cre=new ChatRensponse();
 		}
@@ -240,8 +228,8 @@ public class ChatThread implements Runnable {
 		if(cre.getResponseCode()==-1){
 			System.out.println("Error. Unexpected object format.");
 		}
-		else if(cre.getResponseCode() == 1)
-			System.out.println("Chat Response contains an object: ArrayList<ChatMessages>");	
+		else if(cre.getResponseCode() != 1)
+			System.out.println("Unexpected response code");	
 		return cre;	
 	}
 }

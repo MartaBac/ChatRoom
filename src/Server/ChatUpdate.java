@@ -31,7 +31,6 @@ public class ChatUpdate  {
     }
     
     public ArrayList<ChatMessage> getMessages(){
-    	System.out.println("List: " + list);
     	return this.list;
     }
 }

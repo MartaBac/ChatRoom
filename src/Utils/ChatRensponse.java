@@ -43,7 +43,6 @@ public class ChatRensponse implements Serializable {
 	 */
 	public ChatRensponse (Object p){
 		ArrayList<ChatMessage> k = new ArrayList<ChatMessage>();
-		System.out.println("ChatResponse creation: "+ p.getClass() + "\t" + k.getClass());
     	if(p.getClass().equals(k.getClass())){
     		this.param = p ;
 
@@ -81,12 +80,10 @@ public class ChatRensponse implements Serializable {
 	
 
     public void setParam(Object param){
-    	System.out.println("set param chat rensponse");
     	this.param = (Object) param;
     }
 	
     public void setError(String error){
-    	System.out.println("set error chat rensponse\t"+error);
     	this.error=error;
     	this.responseCode = 2;
     }

@@ -1,6 +1,6 @@
 package Client;
 
-// Nella classe bin :   java client.ChatClient 127.0.0.1
+// In bin class :   java client.ChatClient 127.0.0.1
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +17,8 @@ import Utils.ChatRequest;
 public class ReceiverClient {
 
 	private static int port = 4000;
-		
-	public static void main(String[] args) throws IOException {		
+	  
+	public static void main(String[] args) throws IOException {			
 		ArrayList<ChatMessage> msg = new ArrayList<ChatMessage>();
 		String ipaddr = args[0];
 		String nickname = null;
@@ -28,6 +28,7 @@ public class ReceiverClient {
 		boolean active = false;
 		ChatRequest chatRequest;
 		int count = -1;
+		String out = null;
 		
 		try {
 			ObjectInputStream iis = null;
@@ -46,22 +47,17 @@ public class ReceiverClient {
 				String lineNick = buffer.readLine();
 				
 				// Check nickname validity
-				System.out.println("letto");
 				chatRequest = new ChatRequest("loginrequestrc",lineNick);
 				oos.writeObject(chatRequest);
 				oos.flush();				
 				is = s.getInputStream();
 				iis = new ObjectInputStream(is);	
 				
-				//Server response
-				response = (ChatRensponse) iis.readObject();
-				System.out.println(response);
-				
-				// Check se il response code dà login ok o errore
-				System.out.println("44");
-				
+				// Server response check: logged successfully or not?
+				response = (ChatRensponse) iis.readObject();	
 				if(response.getResponseCode()==0){
-					// Errore di login
+					
+					// Login error
 					System.out.println(response.getError());
 					nickname = null;			
 				}else{
@@ -74,24 +70,24 @@ public class ReceiverClient {
 			ChatRequest act = new ChatRequest("isactive", nickname);
 			
 			while(true){
+				
 			// To start receiver's routine, the account must be activated logging in also in sender mode
+			System.out.println("Waiting for the account to be active (you must be logged in both modes).");
 			while(active == false){
 				oos.writeObject(act);
 				oos.flush();
-				System.out.println("Waiting server response.");
 				is = s.getInputStream();
 				iis = new ObjectInputStream(is);
 				response = (ChatRensponse) iis.readObject();
 				if(response.getResponseCode()==5){
-					// Si è loggato anche il sender
-					System.out.println("Account active");
+					
+					// Also sender is logged in
 					active = true;
 				}
 				else{
-					System.out.println("Sender still not logged ");
-					
+					//System.out.println("Sender still not logged ");	
 				}
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			}						
 			System.out.println("Chat active: waiting for new messages");
 			
@@ -108,11 +104,8 @@ public class ReceiverClient {
 				iis = new ObjectInputStream(is);
 				ob = (ChatRensponse) iis.readObject();
 				
-				System.out.println("<<<<<<<<<<<<<" + ob.getResponseCode());
-				
 				// If there is no new messages
 				if(ob.getResponseCode()==-1){
-					System.out.println("No new message");
 					continue;
 				}				
 				else{
@@ -132,55 +125,27 @@ public class ReceiverClient {
 				// I'm sure i'm getting that
 				msg = (ArrayList<ChatMessage>) ob.getParam();			
 				count = ob.getCount();		
-				/*
-				System.out.println("Checking if active");
-				act = new ChatRequest("isactive", nickname);
-				oos.writeObject(act);
-				oos.flush();
-				is = s.getInputStream();
-				iis = new ObjectInputStream(is);
-				response = (ChatRensponse) iis.readObject();
-				System.out.println("Response: " + response.getResponseCode() + response.getError());
-					
-				if(response.getResponseCode() == 5){
-				*/
+				
 				// Write on receiver's terminal the new messages (public AND private)
-				for(ChatMessage ch: msg){			
+				for(ChatMessage ch: msg){		
+					out = ch.getSender() + " >> " + ch.getMessage();
 					if(ch.getReceiver()!=null){
-						System.out.println("@" + ch.getSender() + ":" + ch.getMessage());
+						out = "[whisper] " + out;
 					}
-					else{
-						System.out.println(ch.getMessage());
-					}
-					
+
+					System.out.println(out);
+			
 				}	
 				count = ob.getCount();		
-				msg = null;	
-				
+				msg = null;		
 				}
-			/*
-				else{
-					
-					if(response.getResponseCode() == 6){
-						System.out.println("Account no more active. Sender logged out.");
-					}
-					else {
-						System.out.println("Unexpected response.");
-					}	
-				}
-				
 				Thread.sleep(1000);
-			}
-			*/
+
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}	
 		s.close();
 	}
-
-
-		
-
 }
 

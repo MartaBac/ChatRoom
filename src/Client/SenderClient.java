@@ -52,7 +52,6 @@ public class SenderClient {
 				is = s.getInputStream();
 				ois = new ObjectInputStream(is);
 				ChatRensponse response = (ChatRensponse) ois.readObject();
-				System.out.println("Server response: " + (String) response.getError());
 				
 				/*
 				 *  If responseCode==0->login error; if responseCode==3 login successful;
@@ -82,9 +81,9 @@ public class SenderClient {
 			String receiver;
 			ChatMessage cm;
 			ChatRequest crMess;
-					
+			System.out.println("Write a message: \n");
 			while(true){
-				System.out.println("Write a message: \n");
+				System.out.print(">>");
 				String line = buffer.readLine();
 				receiver = null;
 
@@ -113,52 +112,37 @@ public class SenderClient {
 						line = parts[1];
 					}
 				}
-				System.out.println("Message:"+line+"\t"+"at\t"+receiver+"from\t"+nickname);
 				
 				/*
 				 *  Creates a ChatMessage that can be private or public,and a ChatRequest
 				 * to send it in chat.
-				 */
-				
+				 */	
 				ChatRensponse resAct = null ;			
-				System.out.println("Logged as \t" + nickname);
-				// Finchè non ricevo la risposta al questo thread
 				Object param = "";
 				ChatRequest req = new ChatRequest("isactive", nickname);
 							
 				while(param == null || !((String) param).equals(nickname)){				
-					System.out.println("Going to enter while:"+ param +" "+(String) param);
-					System.out.println("Start While. req: " + req.getRequestCode() + " " + req.getNick());
 					oos.writeObject(req);
-					oos.flush();
-					System.out.println("wrote");				
+					oos.flush();			
 					is = s.getInputStream();
 					ois = new ObjectInputStream(is);				
 					resAct = (ChatRensponse) ois.readObject();				
-					System.out.println("read");
-					param =  resAct.getParam();
-					System.out.println("I'm in");
-					System.out.println(param);				
+					param =  resAct.getParam();			
 					Thread.sleep(1000);
 				}
-				System.out.println("Received response");
 							
 				if(resAct.getResponseCode()==5){
-					System.out.println("Creating chat message : line - "+ line + "nickname - " + nickname +"-receiver"+ receiver);
 					cm = new ChatMessage(line,nickname, receiver);
 					crMess = new ChatRequest( "addmessages", cm);
 					crMess.setNick(nickname);
 					oos.writeObject(crMess);
 					oos.flush();
 				
-					System.out.println("Chat message sent");
 					// Waiting for the Server response
 					ChatRensponse responseMess = new ChatRensponse();
-					System.out.println("Waiting for an answer.");
 					is = s.getInputStream();
 					ois = new ObjectInputStream(is);
 					responseMess = (ChatRensponse) ois.readObject();
-					System.out.println("Response received");
 					int rs = responseMess.getResponseCode();
 					if(rs==0){
 						
@@ -168,18 +152,17 @@ public class SenderClient {
 					}
 					else{
 						if(rs==2){
-							System.out.println("invio ok");
 							
 							/*
 							 *  Message sent. The response contains the number (count)
 							 * associated to the message.
 							 */	
-							System.out.println(responseMess.getParam());
-							System.out.println(responseMess.getError());
-							System.out.println(responseMess.getResponseCode());
 							size = responseMess.getCount();
-							System.out.println("Invio messaggio eseguito con successo. "
-									+ "Messaggio in posizione: " + size);
+							/*
+							 System.out.println("Invio messaggio eseguito con successo. "
+							 + "Messaggio in posizione: " + size);
+							 */
+									
 						}
 						else{
 							System.out.println("Error: unexpected answer from the server.");

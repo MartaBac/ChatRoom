@@ -17,7 +17,6 @@ public class ChatRoom {
 	public static ChatUpdate getMessages(int c, String nick) {
 		ChatUpdate cu=null;	
 		if(msg.size() <= c || msg.size() == 0){
-			System.out.println("No new messages available");
 			cu = new ChatUpdate(null, c);
 			return cu;
 		}
@@ -41,7 +40,6 @@ public class ChatRoom {
 			msg.add(m);
 		else
 			return -1;
-		System.out.println("Message size"+msg.size());
 		return msg.size();
 	}
 
