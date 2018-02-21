@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Map;
 
 import Utils.ChatMessage;
 import Utils.ChatRensponse;
@@ -82,8 +83,13 @@ public class ChatThread implements Runnable {
 						os = this.client.getOutputStream();		
 						exit = true;						
 						break;
-					case "users":
-						activeList = ChatServer.getActive();
+						
+					case "users":				
+						activeList = new ArrayList<String>();
+							for(Map.Entry<String,Users> map : ChatServer.utenti.entrySet()){
+								if(map.getValue().getActive()==true)
+									activeList.add(map.getValue().getId());
+							}			
 						cr = new ChatRensponse(activeList);
 						cr.setRensponseCode(7);
 						break;

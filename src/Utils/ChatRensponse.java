@@ -10,9 +10,6 @@ import java.util.ArrayList;
 
 public class ChatRensponse implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Object param;
 	/*
@@ -101,17 +98,6 @@ public class ChatRensponse implements Serializable {
     	return error;
     }
     
-    /*
-     * Return responseCode: 
-     * -1 se errore
-	 * 0 errore login
-	 * +1 per lista dei messaggi
-	 * +2 se è stato aggiunto un messaggio, ritorna l'indice
-	 * +3 logged in sender mode
-	 * +4 logged in receiver mode
-	 * +5 account attivato
-	 * +6 account disattivo
-     */
     public int getResponseCode(){
     	return responseCode;
     }
@@ -120,6 +106,11 @@ public class ChatRensponse implements Serializable {
     	this.count = c;
     }
     
+	/*
+	 *  If the message has been correctly sent counts contains the number associated 
+	 *  to the message (currently not used).
+	 */
+ 
     public int getCount(){
     	return this.count;
     }

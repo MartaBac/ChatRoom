@@ -11,8 +11,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-
-import Server.Users;
 import Utils.ChatMessage;
 import Utils.ChatRensponse;
 import Utils.ChatRequest;
@@ -26,7 +24,6 @@ public class SenderClient {
 		Socket s = new Socket();
 		String nickname = null;
 		ChatRequest cr = null;
-		int size = -1;
 		ArrayList<String> u = null;
 
 		// Output channel to communicate from client to server
@@ -41,6 +38,7 @@ public class SenderClient {
 			BufferedReader buffer = new BufferedReader(reader);
 			ChatRequest request;
 			ChatRensponse response;
+			
 			// Output channel to communicate from server to client
 			os = s.getOutputStream();
 			oos = new ObjectOutputStream(os);
@@ -180,16 +178,15 @@ public class SenderClient {
 						int rs = responseMess.getResponseCode();
 						if (rs == 0) {
 
-							// Server has returned a generic error; writing out
-							// error message.
+							// Server has returned a generic error; writing out error message.
 							System.out.println("Invio fallito:" + responseMess.getError().toString());
 						} else {
-							if (rs == 2)
-								// Message sent. The response contains the
-								// number (count) associated to the message.
-								size = responseMess.getCount();
-							else
+							if (rs != 2)
 								System.out.println("Error: unexpected answer from the server.");
+								
+							/* else <- Message sent. The response contains the number (count) 
+							 associated to the message. Not going to use it. 
+								size = responseMess.getCount();		*/
 						}
 					} else
 

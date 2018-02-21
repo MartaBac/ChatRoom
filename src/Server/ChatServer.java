@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import Utils.ChatMessage;
-import Utils.ChatRensponse;
-
 public class ChatServer {
 
 	private static int port = 4000;
@@ -36,14 +33,7 @@ public class ChatServer {
 		}
 
 	}
-	public static ArrayList<String> getActive(){
-		ArrayList<String> arList = new ArrayList<String>();
-			for(Map.Entry<String,Users> map : utenti.entrySet()){
-				if(map.getValue().getActive()==true)
-					arList.add(map.getValue().getId());
-			}
-		return arList;	
-	}
+
 	
 	
 
