@@ -2,7 +2,12 @@ package Server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import Utils.ChatMessage;
+import Utils.ChatRensponse;
 
 public class ChatServer {
 
@@ -30,6 +35,14 @@ public class ChatServer {
 			e.printStackTrace();
 		}
 
+	}
+	public static ArrayList<String> getActive(){
+		ArrayList<String> arList = new ArrayList<String>();
+			for(Map.Entry<String,Users> map : utenti.entrySet()){
+				if(map.getValue().getActive()==true)
+					arList.add(map.getValue().getId());
+			}
+		return arList;	
 	}
 	
 	

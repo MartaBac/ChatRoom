@@ -25,6 +25,7 @@ public class ChatRensponse implements Serializable {
 	 * +4 logged in receiver mode
 	 * +5 account activated
 	 * +6 account disabled
+	 * +7 active accounts list
 	 */
 	private int responseCode; 
 	private String error;

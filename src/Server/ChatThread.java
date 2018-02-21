@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import Utils.ChatMessage;
 import Utils.ChatRensponse;
@@ -31,6 +32,7 @@ public class ChatThread implements Runnable {
 	ObjectInputStream ois = null;
 	ObjectOutputStream oos = null;
 	type = null;
+	ArrayList<String> activeList;
 	
 		try{					
 			System.out.println("New thread");					
@@ -80,6 +82,11 @@ public class ChatThread implements Runnable {
 						os = this.client.getOutputStream();		
 						exit = true;						
 						break;
+					case "users":
+						activeList = ChatServer.getActive();
+						cr = new ChatRensponse(activeList);
+						cr.setRensponseCode(7);
+						break;
 						
 					case "getmessages":
 						if(ChatServer.utenti.get(param).getActive()==false){
@@ -99,7 +106,6 @@ public class ChatThread implements Runnable {
 						
 						// Adds the message and returns index 
 						int c = ChatRoom.addMessage(cm);
-						System.out.println("Receiver:"+cm.getReceiver());
 						cr = new ChatRensponse(2,c);
 						break;					
 				}
