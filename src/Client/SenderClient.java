@@ -133,6 +133,10 @@ public class SenderClient {
 						}				
 					}
 					break;
+					
+				// To handle or it will generate an exception
+				case "":
+					break;
 
 				// Normal message to send
 				default:
@@ -196,6 +200,17 @@ public class SenderClient {
 				}
 			}
 		} catch (Exception e) {
+			
+			// Handling sender logout
+			ChatRequest ex = new ChatRequest("quit","sender", nickname);
+			System.out.println(ex.getNick() + ex.getRequestCode());
+			oos.writeObject(ex);
+			oos.flush();		
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}	
 			e.printStackTrace();
 		}
 		s.close();

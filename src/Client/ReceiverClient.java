@@ -132,9 +132,7 @@ public class ReceiverClient {
 					if(ch.getReceiver()!=null){
 						out = "[whisper] " + out;
 					}
-
 					System.out.println(out);
-			
 				}	
 				count = ob.getCount();		
 				msg = null;		
@@ -143,6 +141,18 @@ public class ReceiverClient {
 
 			}
 		}catch(Exception e){
+			
+			// Handling receiver logout
+			ChatRequest ex = new ChatRequest("quit","receiver", nickname);	
+			OutputStream os = s.getOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(os);			
+			oos.writeObject(ex);
+			oos.flush();		
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}		
 			e.printStackTrace();
 		}	
 		s.close();

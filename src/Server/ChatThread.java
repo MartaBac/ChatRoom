@@ -6,8 +6,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Map;
+
+import org.omg.CORBA.ExceptionList;
 
 import Utils.ChatMessage;
 import Utils.ChatRensponse;
@@ -66,17 +69,24 @@ public class ChatThread implements Runnable {
 						
 					case "quit":
 						System.out.println("Logging out.");
-						if(request.getParam().toString().equals("receiver"))
+						if(request.getParam().toString().equals("receiver")){
+							System.out.println("receiver logged out <<<<");
 							ChatServer.utenti.get(param).setReceiver(false);
+						}
 						else {
-								if(request.getParam().toString().equals("sender"))
-									ChatServer.utenti.get(param).setReceiver(false);
+								if(request.getParam().toString().equals("sender")){
+									System.out.println("sender logged out <<<<");
+									ChatServer.utenti.get(param).setSender(false);
+								}
 								else{
-									System.out.println("Error: param not recognizable: logging out from both modes.");
+									System.out.println("------------------------");
+									System.out.println("Error: param not recognizable:"
+											+ " logging out from both modes.");
 									ChatServer.utenti.get(param).setReceiver(false);
 									ChatServer.utenti.get(param).setSender(false);
 								}
 						}
+						ChatServer.utenti.get(param).setActive(false);
 						cr = new ChatRensponse();
 						cr.setRensponseCode(6);
 						cr.setError("Account correctly disabled");		
@@ -121,10 +131,19 @@ public class ChatThread implements Runnable {
 				oos.flush();	
 				Thread.sleep(1000);
 			}			
-		}catch(Exception e ){
-			System.out.println(type + " ChatThread Exception:" + e.getMessage());
-			System.out.println(param + " " + cr.getResponseCode());
+		}		
+		catch(Exception e ){		
 			e.printStackTrace();
+					
+			// Log out
+			if(type.equals("sender")){	
+				ChatServer.utenti.get(param).setActive(false);
+				ChatServer.utenti.get(param).setSender(false);	
+			}
+			else if(type.equals("receiver")){
+				ChatServer.utenti.get(param).setActive(false);
+				ChatServer.utenti.get(param).setReceiver(false);	
+			}	
 		}
 	}
 
@@ -172,8 +191,8 @@ public class ChatThread implements Runnable {
 				}
 			}
 			else{			
-				k.setError(type + "Someone already logged with the selected nickname in sender"
-						+ " mode.");
+				k.setError(type + "Someone already logged with the selected "
+						+ "nickname in sender mode.");
 				System.out.println(k.getError());
 				k.setRensponseCode(0);
 				return k;
@@ -217,7 +236,8 @@ public class ChatThread implements Runnable {
 			
 			// Record already in memory and user logged in receiver mode
 			else{
-				System.out.println("Error logging in. Someone else is already logged with this nickname in receiver mode");
+				System.out.println("Error logging in. Someone else is already "
+						+ "logged with this nickname in receiver mode");
 				
 				// Error logging in
 				k.setError("Someone already logged with the selected nickname.");

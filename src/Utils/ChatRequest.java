@@ -9,9 +9,6 @@ import java.io.Serializable;
 
 public class ChatRequest implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	/*
 	 * request code =  quit -> param contains if send or receiver
@@ -76,6 +73,10 @@ public class ChatRequest implements Serializable {
 		if(p.getClass().equals(ChatMessage.class)){
 			requestCode = "addMessage";
 		}
+	}
+	
+	public void setRequestCode(String r){
+		this.requestCode = r;
 	}
 	
 	public String getRequestCode(){
